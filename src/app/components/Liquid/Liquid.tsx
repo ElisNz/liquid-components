@@ -1,13 +1,85 @@
 'use client';
 
-import { useState, useRef, useCallback, useId } from 'react';
+import { useState, useRef, useCallback, useId, useEffect } from 'react';
 import styles from './Liquid.module.css';
 
-const BUBBLE_COUNT = 8;
+const BUBBLE_COUNT = 12;
+const REPULSE_RANGE = 120;    // px — how close the cursor must be to start pushing
+const REPULSE_STRENGTH = 25;  // px — maximum displacement at distance = 0
 
 const Liquid = () => {
   const [wobbling, setWobbling] = useState<Set<number>>(new Set());
   const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+  const gooeyRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+
+  // --- Cursor repulsion ---
+  useEffect(() => {
+    const gooey = gooeyRef.current;
+    if (!gooey) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        const rect = gooey.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const bubbles = gooey.children;
+        for (let i = 0; i < bubbles.length; i++) {
+          const el = bubbles[i] as HTMLElement;
+          const bRect = el.getBoundingClientRect();
+          const bCenterX = bRect.left + bRect.width / 2 - rect.left;
+          const bCenterY = bRect.top + bRect.height / 2 - rect.top;
+
+          const dx = bCenterX - mouseX;
+          const dy = bCenterY - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < REPULSE_RANGE && dist > 0) {
+            // Quadratic falloff feels more natural than linear
+            const t = 1 - dist / REPULSE_RANGE;
+            const force = t * t * REPULSE_STRENGTH;
+            const angle = Math.atan2(dy, dx);
+
+            // Clamp so bubble stays within parent bounds
+            let rx = Math.cos(angle) * force;
+            let ry = Math.sin(angle) * force;
+            const maxX = rect.width - (bRect.left - rect.left + bRect.width);
+            const minX = -(bRect.left - rect.left);
+            const maxY = rect.height - (bRect.top - rect.top + bRect.height);
+            const minY = -(bRect.top - rect.top);
+            rx = Math.max(minX, Math.min(maxX, rx));
+            ry = Math.max(minY, Math.min(maxY, ry));
+
+            el.style.setProperty('--repulse-x', `${rx}px`);
+            el.style.setProperty('--repulse-y', `${ry}px`);
+          } else {
+            el.style.setProperty('--repulse-x', '0px');
+            el.style.setProperty('--repulse-y', '0px');
+          }
+        }
+      });
+    };
+
+    const handleMouseLeave = () => {
+      cancelAnimationFrame(rafRef.current);
+      const bubbles = gooey.children;
+      for (let i = 0; i < bubbles.length; i++) {
+        const el = bubbles[i] as HTMLElement;
+        el.style.setProperty('--repulse-x', '0px');
+        el.style.setProperty('--repulse-y', '0px');
+      }
+    };
+
+    gooey.addEventListener('mousemove', handleMouseMove);
+    gooey.addEventListener('mouseleave', handleMouseLeave);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      gooey.removeEventListener('mousemove', handleMouseMove);
+      gooey.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
 
   const handleBubbleHover = useCallback((index: number) => {
     // Clear any existing timer for this bubble so rapid hovers restart the animation
@@ -76,7 +148,7 @@ const Liquid = () => {
       </svg>
 
       <div className={styles.glow} />
-      <div className={styles.gooey} style={{ filter: `url(#${filterId})` }}>
+      <div ref={gooeyRef} className={styles.gooey} style={{ filter: `url(#${filterId})` }}>
         {Array.from({ length: BUBBLE_COUNT }, (_, index) => (
           <div
             key={index}

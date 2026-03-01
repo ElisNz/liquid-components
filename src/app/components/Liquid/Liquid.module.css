@@ -1,3 +1,11 @@
+@layer liquid;
+
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #c0392b;
+  --white: #ffffff;
+}
+
 .liquid {
   position: relative;
   width: 100%;
@@ -22,8 +30,15 @@
   position: absolute;
 	width: 40%;
 	height: 40%;
-	background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
-	animation: move 2s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 40% 40%, var(--primary-color) 1%, var(--secondary-color) 40%);
+  transform-origin: center;
+  /* Repulsion offset — set by JS mousemove handler */
+  --repulse-x: 0px;
+  --repulse-y: 0px;
+  translate: var(--repulse-x) var(--repulse-y);
+  transition: translate 0.25s ease-out;
+	animation:
+    move 2s ease-in-out infinite alternate,
 } .bubble.wobble {
   animation: wobbleSettle 0.5s ease-in-out forwards;
 }
@@ -31,6 +46,7 @@
 .bubble:nth-child(1) {
   width: 10%;
   height: 10%;
+  --spin-duration: 6s;
 } 
 
 .bubble:nth-child(2) {
@@ -38,7 +54,6 @@
 	height: 15%;
   bottom: 20%;
   left: 27%;
-  transform: rotate(45deg);
 }
 
 .bubble:nth-child(3) {
@@ -46,15 +61,12 @@
 	height: 20%;
   top: 30%;
   left: 5%;
-  transform: rotate(-30deg);
-  animation-delay: move 50ms;
 }
 
 .bubble:nth-child(4) {
 	width: 10%;
 	height: 10%;
   bottom: 23%;
-  transform: rotate(15deg);
 }
 
 .bubble:nth-child(5) {
@@ -78,7 +90,23 @@
   top: 35%;
   right: 10%;
 }
+.bubble:nth-child(9) {
+  width: 12%;
+  height: 12%;
+  top: 20%;
+  right: 20%;
+}
+.bubble:nth-child(10) {
+  width: 8%;
+  height: 8%;
+  top: 25%;
+  left: 40%;
+}
 
+
+@keyframes spin {
+  to { rotate: 360deg; }
+}
 
 @keyframes move {
 	0% {
