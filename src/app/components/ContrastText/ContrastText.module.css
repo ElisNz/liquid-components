@@ -1,0 +1,8 @@
+.contrast {
+  position: relative;
+  mix-blend-mode: difference;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10;
+}

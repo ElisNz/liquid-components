@@ -1,8 +1,8 @@
 @layer liquid;
 
 :root {
-  --primary-color: #ff6b6b;
-  --secondary-color: #c0392b;
+  --primary-color: #f25015;
+  --secondary-color: #15e3a9;
   --white: #ffffff;
 }
 
@@ -30,17 +30,21 @@
   position: absolute;
 	width: 40%;
 	height: 40%;
-  background: radial-gradient(circle at 40% 40%, var(--primary-color) 1%, var(--secondary-color) 40%);
   transform-origin: center;
   /* Repulsion offset — set by JS mousemove handler */
   --repulse-x: 0px;
   --repulse-y: 0px;
+  background-color: var(--primary-color);
   translate: var(--repulse-x) var(--repulse-y);
   transition: translate 0.25s ease-out;
 	animation:
     move 2s ease-in-out infinite alternate,
 } .bubble.wobble {
   animation: wobbleSettle 0.5s ease-in-out forwards;
+} .light {
+  --light-x: 0px;
+  --light-y: 0px;
+  background: radial-gradient(circle at calc(50% - var(--light-x)) calc(50% - var(--light-y)), var(--white) 1%, var(--primary-color) 60%);
 }
 
 .bubble:nth-child(1) {
@@ -146,6 +150,23 @@
   transform: translate(-50%, -50%);
   width: 70%;
   height: 70%;
-  background: radial-gradient(circle at center, rgba(255, 107, 107, 0.6), transparent);
+  background: radial-gradient(circle at center, var(--foreground), transparent);
   filter: blur(100px);
+}
+
+.text {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--white);
+  mix-blend-mode: difference;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10;
 }

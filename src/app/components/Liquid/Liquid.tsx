@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useRef, useCallback, useId, useEffect } from 'react';
+import ContrastText from '../ContrastText/ContrastText';
 import styles from './Liquid.module.css';
 
 const BUBBLE_COUNT = 12;
 const REPULSE_RANGE = 120;    // px — how close the cursor must be to start pushing
 const REPULSE_STRENGTH = 25;  // px — maximum displacement at distance = 0
 
-const Liquid = () => {
+const Liquid = ({label, light, glow, className}: {label?: string, light?: boolean, glow?: boolean, className?: string}) => {
   const [wobbling, setWobbling] = useState<Set<number>>(new Set());
   const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
   const gooeyRef = useRef<HTMLDivElement>(null);
@@ -26,6 +27,7 @@ const Liquid = () => {
         const mouseY = e.clientY - rect.top;
 
         const bubbles = gooey.children;
+
         for (let i = 0; i < bubbles.length; i++) {
           const el = bubbles[i] as HTMLElement;
           const bRect = el.getBoundingClientRect();
@@ -35,6 +37,7 @@ const Liquid = () => {
           const dx = bCenterX - mouseX;
           const dy = bCenterY - mouseY;
           const dist = Math.sqrt(dx * dx + dy * dy);
+
 
           if (dist < REPULSE_RANGE && dist > 0) {
             // Quadratic falloff feels more natural than linear
@@ -49,12 +52,23 @@ const Liquid = () => {
             const minX = -(bRect.left - rect.left);
             const maxY = rect.height - (bRect.top - rect.top + bRect.height);
             const minY = -(bRect.top - rect.top);
+
             rx = Math.max(minX, Math.min(maxX, rx));
             ry = Math.max(minY, Math.min(maxY, ry));
+
+            // Light position clamped to bubble's own bounds
+            const lx = Math.max(-bRect.width / 2, Math.min(bRect.width / 2, rx));
+            const ly = Math.max(-bRect.height / 2, Math.min(bRect.height / 2, ry));
+
+
+            el.style.setProperty('--light-x', `${light ? lx : 0}px`);
+            el.style.setProperty('--light-y', `${light ? ly : 0}px`);
 
             el.style.setProperty('--repulse-x', `${rx}px`);
             el.style.setProperty('--repulse-y', `${ry}px`);
           } else {
+            el.style.setProperty('--light-x', '0px');
+            el.style.setProperty('--light-y', '0px');
             el.style.setProperty('--repulse-x', '0px');
             el.style.setProperty('--repulse-y', '0px');
           }
@@ -100,13 +114,6 @@ const Liquid = () => {
     timersRef.current.set(index, timer);
   }, []);
 
-  const onClick = useCallback(() => {
-    // Trigger a wobble on all bubbles when the container is clicked
-    setWobbling(new Set(Array.from({ length: BUBBLE_COUNT }, (_, i) => i)));
-    // Clear all timers to prevent them from removing the wobble prematurely
-    timersRef.current.forEach(timer => clearTimeout(timer));
-    timersRef.current.clear();
-  }, []);
 
   const rawId = useId();
   // useId can contain colons which are invalid in SVG id attributes
@@ -114,7 +121,7 @@ const Liquid = () => {
 
 
   return (
-    <div className={styles.liquid}>
+    <div className={className ? `${styles.liquid} ${className}` : styles.liquid}>
       {/* Hidden SVG — defines the metaball filter once per instance */}
       <svg
         style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
@@ -147,12 +154,13 @@ const Liquid = () => {
         </defs>
       </svg>
 
-      <div className={styles.glow} />
+      {glow && <div className={styles.glow} />}
+      {label && <ContrastText className={styles.text}>{label}</ContrastText>}
       <div ref={gooeyRef} className={styles.gooey} style={{ filter: `url(#${filterId})` }}>
         {Array.from({ length: BUBBLE_COUNT }, (_, index) => (
           <div
             key={index}
-            className={`${styles.bubble} ${wobbling.has(index) ? styles.wobble : ''}`}
+            className={`${styles.bubble } ${wobbling.has(index) ? styles.wobble : ''} ${light ? styles.light : ''}`}
             onMouseEnter={() => handleBubbleHover(index)}
           />
         ))}
