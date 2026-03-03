@@ -7,9 +7,11 @@ import styles from './Liquid.module.css';
 const BUBBLE_COUNT = 12;
 const REPULSE_RANGE = 120;    // px — how close the cursor must be to start pushing
 const REPULSE_STRENGTH = 25;  // px — maximum displacement at distance = 0
+const INTRO_TIME = 1500;      // ms — how long the intro animation lasts
 
 const Liquid = ({label, light, glow, className}: {label?: string, light?: boolean, glow?: boolean, className?: string}) => {
   const [wobbling, setWobbling] = useState<Set<number>>(new Set());
+  const [intro, setIntro] = useState(true);
   const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
   const gooeyRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
@@ -18,6 +20,7 @@ const Liquid = ({label, light, glow, className}: {label?: string, light?: boolea
   useEffect(() => {
     const gooey = gooeyRef.current;
     if (!gooey) return;
+    setTimeout(() => setIntro(false), INTRO_TIME); 
 
     const handleMouseMove = (e: MouseEvent) => {
       cancelAnimationFrame(rafRef.current);
@@ -160,7 +163,12 @@ const Liquid = ({label, light, glow, className}: {label?: string, light?: boolea
         {Array.from({ length: BUBBLE_COUNT }, (_, index) => (
           <div
             key={index}
-            className={`${styles.bubble } ${wobbling.has(index) ? styles.wobble : ''} ${light ? styles.light : ''}`}
+            className={`
+              ${intro ? styles.intro : ''}
+              ${styles.bubble } 
+              ${wobbling.has(index) ? styles.wobble : ''} 
+              ${light ? styles.light : ''} 
+            `}
             onMouseEnter={() => handleBubbleHover(index)}
           />
         ))}

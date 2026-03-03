@@ -45,6 +45,10 @@
   --light-x: 0px;
   --light-y: 0px;
   background: radial-gradient(circle at calc(50% - var(--light-x)) calc(50% - var(--light-y)), var(--white) 1%, var(--primary-color) 60%);
+} .intro {
+  --intro-time: 1.5s;
+  animation: fadeIn calc(var(--intro-time) * 0.75) ease-out forwards, wobbleSettle calc(var(--intro-time) * 0.25) ease-in-out calc(var(--intro-time) * 0.75) forwards;
+
 }
 
 .bubble:nth-child(1) {
@@ -140,6 +144,17 @@
   100% { 
     border-radius: 75% 25% 20% 80% / 34% 47% 53% 66%;
     transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    transform: scale(0);
+    border-radius: 100%;
+  }
+  to { 
+    transform: scale(1);
+    border-radius: 75%;
   }
 }
 
