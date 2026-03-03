@@ -46,7 +46,6 @@
   --light-y: 0px;
   background: radial-gradient(circle at calc(50% - var(--light-x)) calc(50% - var(--light-y)), var(--white) 1%, var(--primary-color) 60%);
 } .intro {
-  --intro-time: 1.5s;
   animation: fadeIn calc(var(--intro-time) * 0.75) ease-out forwards, wobbleSettle calc(var(--intro-time) * 0.25) ease-in-out calc(var(--intro-time) * 0.75) forwards;
 
 }
@@ -165,7 +164,7 @@
   transform: translate(-50%, -50%);
   width: 70%;
   height: 70%;
-  background: radial-gradient(circle at center, var(--foreground), transparent);
+  background: radial-gradient(circle at center, var(--primary-color), transparent);
   filter: blur(100px);
 }
 

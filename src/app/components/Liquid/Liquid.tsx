@@ -9,7 +9,7 @@ const REPULSE_RANGE = 120;    // px — how close the cursor must be to start pu
 const REPULSE_STRENGTH = 25;  // px — maximum displacement at distance = 0
 const INTRO_TIME = 1500;      // ms — how long the intro animation lasts
 
-const Liquid = ({label, light, glow, className}: {label?: string, light?: boolean, glow?: boolean, className?: string}) => {
+const Liquid = ({label, light, glow, color, className}: {label?: string, light?: boolean, glow?: boolean, color?: string, className?: string}) => {
   const [wobbling, setWobbling] = useState<Set<number>>(new Set());
   const [intro, setIntro] = useState(true);
   const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
@@ -124,7 +124,7 @@ const Liquid = ({label, light, glow, className}: {label?: string, light?: boolea
 
 
   return (
-    <div className={className ? `${styles.liquid} ${className}` : styles.liquid}>
+    <div className={className ? `${styles.liquid} ${className}` : styles.liquid} style={{ ['--primary-color' as string]: color, ['--intro-time' as string]: `${INTRO_TIME * 0.001}s` }}>
       {/* Hidden SVG — defines the metaball filter once per instance */}
       <svg
         style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
@@ -159,15 +159,15 @@ const Liquid = ({label, light, glow, className}: {label?: string, light?: boolea
 
       {glow && <div className={styles.glow} />}
       {label && <ContrastText className={styles.text}>{label}</ContrastText>}
-      <div ref={gooeyRef} className={styles.gooey} style={{ filter: `url(#${filterId})` }}>
+      <div ref={gooeyRef} className={styles.gooey} style={{ filter: `url(#${filterId})`}}>
         {Array.from({ length: BUBBLE_COUNT }, (_, index) => (
           <div
             key={index}
             className={`
-              ${intro ? styles.intro : ''}
               ${styles.bubble } 
               ${wobbling.has(index) ? styles.wobble : ''} 
               ${light ? styles.light : ''} 
+              ${intro ? styles.intro : ''}
             `}
             onMouseEnter={() => handleBubbleHover(index)}
           />
