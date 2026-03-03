@@ -23,10 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--white);
-  mix-blend-mode: difference;
+  font-size: 1.1rem;
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;

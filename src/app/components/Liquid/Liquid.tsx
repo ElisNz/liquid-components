@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useId, useEffect } from 'react';
+import { useState, useRef, useCallback, useId, useEffect, useMemo } from 'react';
 import ContrastText from '../ContrastText/ContrastText';
 import styles from './Liquid.module.css';
 
@@ -122,6 +122,33 @@ const Liquid = ({label, light, glow, color, className}: {label?: string, light?:
   // useId can contain colons which are invalid in SVG id attributes
   const filterId = `gooey-${rawId.replace(/:/g, '')}`;
 
+  // Stable random sizes/positions generated once per mount
+  const bubbleStyles = useMemo(() => {
+    // First bubble: large (~40%), near-centered with ±5% deviation
+    const hero = (() => {
+      const size = Math.random() * 6 + 37; // 37% – 43%
+      const offset = () => 50 - size / 2 + (Math.random() * 10 - 5); // center minus half-size ± 5%
+      return {
+        width: `${size}%`,
+        height: `${size}%`,
+        top: `${offset()}%`,
+        left: `${offset()}%`,
+      };
+    })();
+
+    const rest = Array.from({ length: BUBBLE_COUNT - 1 }, () => {
+      const size = Math.random() * 18 + 7; // 7% – 25%
+      return {
+        width: `${size}%`,
+        height: `${size}%`,
+        top: `${Math.random() * 75}%`,
+        left: `${Math.random() * 75}%`
+      };
+    });
+
+    return [hero, ...rest];
+  }, []);
+
 
   return (
     <div className={className ? `${styles.liquid} ${className}` : styles.liquid} style={{ ['--primary-color' as string]: color, ['--intro-time' as string]: `${INTRO_TIME * 0.001}s` }}>
@@ -162,7 +189,9 @@ const Liquid = ({label, light, glow, color, className}: {label?: string, light?:
       <div ref={gooeyRef} className={styles.gooey} style={{ filter: `url(#${filterId})`}}>
         {Array.from({ length: BUBBLE_COUNT }, (_, index) => (
           <div
+            suppressHydrationWarning
             key={index}
+            style={bubbleStyles[index]}
             className={`
               ${styles.bubble } 
               ${wobbling.has(index) ? styles.wobble : ''} 
