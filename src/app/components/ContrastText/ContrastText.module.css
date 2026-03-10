@@ -1,6 +1,6 @@
 .contrast {
   position: relative;
-  mix-blend-mode:luminosity;
+  mix-blend-mode: luminosity;
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;

@@ -3,7 +3,6 @@
 :root {
   --primary-color: #f25015;
   --secondary-color: #15e3a9;
-  --white: #ffffff;
 }
 
 .liquid {
@@ -38,19 +37,18 @@
   translate: var(--repulse-x) var(--repulse-y);
   transition: translate 0.25s ease-out;
 	animation:
-    move 2s ease-in-out infinite alternate,
+    move 4s ease-in-out infinite alternate,
 } .bubble.wobble {
   animation: wobbleSettle 0.5s ease-in-out forwards;
 } .light {
   --light-x: 0px;
   --light-y: 0px;
-  background: radial-gradient(circle at calc(50% - var(--light-x)) calc(50% - var(--light-y)), var(--white) 1%, var(--primary-color) 60%);
+  --light-color: rgba(255, 255, 255, 0.546);
+  background: radial-gradient(circle at calc(50% - var(--light-x)) calc(50% - var(--light-y)), var(--light-color) 35%, var(--primary-color) 40%);
 } .intro {
   animation: fadeIn calc(var(--intro-time) * 0.75) ease-out forwards, wobbleSettle calc(var(--intro-time) * 0.25) ease-in-out calc(var(--intro-time) * 0.75) forwards;
 
 }
-
-
 
 
 @keyframes spin {
@@ -60,16 +58,17 @@
 @keyframes move {
 	0% {
 		border-radius: 75% 25% 20% 80% / 34% 47% 53% 66%;
-    transform: translateY(0) rotate(0);
+    transform: translateY(0);
 	}
 	
 	50% {
 		border-radius: 80%;
+    transform: translateY(-5%) rotate(45deg);
 	}
 
 	100% {
 		border-radius: 45% 25% 30% 37% / 44% 37% 53% 66%;
-		transform: translateY(10%) rotate(inherit);
+		transform: translateY(inherit);
 	}
 }
 

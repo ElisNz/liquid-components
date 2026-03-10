@@ -15,6 +15,9 @@ export default function Home() {
           <ContrastText className={styles.heading}>{text}</ContrastText>
           <Liquid className={styles.background} glow color="#00c372ff"/>
         </div>
+        <div className={styles.container}>
+          <Liquid className={styles.background} light color="#c0c300ff"/>
+        </div>
       </main>
     </div>
   );

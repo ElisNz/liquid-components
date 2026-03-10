@@ -124,6 +124,12 @@ const Liquid = ({label, light, glow, color, className}: {label?: string, light?:
 
   // Stable random sizes/positions generated once per mount
   const bubbleStyles = useMemo(() => {
+
+    const { min, max } = {
+      min: 4,   // % — smallest bubble diameter
+      max: 20,  // % — largest bubble diameter
+    };
+
     // First bubble: large (~40%), near-centered with ±5% deviation
     const hero = (() => {
       const size = Math.random() * 6 + 37; // 37% – 43%
@@ -137,12 +143,26 @@ const Liquid = ({label, light, glow, color, className}: {label?: string, light?:
     })();
 
     const rest = Array.from({ length: BUBBLE_COUNT - 1 }, () => {
-      const size = Math.random() * 18 + 7; // 7% – 25%
+      // Pick a random center point for the bubble within the element
+      const cx = Math.random() * 80 + 10; // 10% – 90%
+      const cy = Math.random() * 80 + 10; // 10% – 90%
+
+      // Normalised distance from the element's center (50%, 50%): 0 = center, 1 = outermost corner
+      const dx = cx - 50;
+      const dy = cy - 50;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = Math.SQRT2 * 40; // ≈56.6 — corner distance when cx/cy ∈ [10, 90]
+      const t = Math.min(dist / maxDist, 1);
+
+      // Outer bubbles are smaller; add ±25% jitter for an organic look
+      const baseSize = max - t * (max - min);
+      const size = baseSize * (0.75 + Math.random() * 0.5);
+
       return {
         width: `${size}%`,
         height: `${size}%`,
-        top: `${Math.random() * 75}%`,
-        left: `${Math.random() * 75}%`
+        top: `${cy - size / 2}%`,
+        left: `${cx - size / 2}%`,
       };
     });
 
@@ -178,7 +198,7 @@ const Liquid = ({label, light, glow, color, className}: {label?: string, light?:
               values="1 0 0 0 0
                       0 1 0 0 0
                       0 0 1 0 0
-                      0 0 0 20 -9"
+                      0 0 0 40 -9"
             />
           </filter>
         </defs>
